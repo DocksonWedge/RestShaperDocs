@@ -1,0 +1,78 @@
+openapi: '3.0.2'
+info:
+  title: REST Shaper
+  version: '1.0'
+servers:
+  - url: https://api.server.test/v1
+paths:
+  /shaper/run:
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/run'
+      responses:
+        '202':
+          description: OK
+        '400':
+          description: INVALID DATA
+  /shaper/status/{runId}:
+    parameters:
+      - in: path
+        name: runId
+        description: A UUID returned by `/shaper/run` identifying a test execution.
+        required: true
+        schema: 
+          type: string
+    get:
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: NOT FOUND
+  /shaper/report/{runId}:
+    parameters:
+        - in: path
+          name: runId
+          description: A UUID returned by `/shaper/run` identifying a test execution.
+          required: true
+          schema: 
+            type: string
+    get:
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: NOT FOUND
+components:
+  schemas:
+    run:  
+      description: data required to start a test run
+      type: object
+      properties: 
+        endpoints: 
+          type: array
+          description: The endpoints from the open api spec to test.
+          items:
+            type: object
+            properties:
+              method:
+                type: string
+                description: The REST API method for the endpoint under test.
+                example: GET
+              path: 
+                type: string
+                description: The url path of the endpoint under test
+                example: /pet/{pet_id}
+        swaggerUrl: 
+          type: string
+          description: URL of the swagger doc to to test.
+          example: https://petstore.swagger.io/v2/swagger.json
+        staticParams:
+          type: object
+          description: parameters to pass to EVERY request in the run.
+          properties:
+            queryParams:
+              type: array
