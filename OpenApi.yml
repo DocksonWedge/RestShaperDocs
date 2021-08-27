@@ -7,6 +7,7 @@ servers:
 paths:
   /shaper/run:
     post:
+      description: Begins a test run asynchrounously agains the specified endpoint. Use `GET /shaper/status` to check for completion. 
       requestBody:
         required: true
         content:
@@ -27,31 +28,83 @@ paths:
         schema: 
           type: string
     get:
+      description: Returns the scurrent status of a test run. Once the run is DONE, this will also return a results summary with result IDs that can be used to generate the detailed report.
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  status: 
+                    description: The current status of the specified test run.
+                    type: string
+                    enum:
+                      - "DONE"
+                      - "IN_PROGRESS"
+                  results:
+                    description: The ids of completed results. Only populated when status is DONE.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        resultId:
+                          type: string
+                          description: UUID identifying a test result
+                        status: 
+                          type: integer
+                          description: The HTTP status code returned by the request
+                          example: 500
+                        endpoint: 
+                          type: string
+                          description: The endpoint under test during for this result
         '404':
           description: NOT FOUND
-  /shaper/report/{runId}:
+  /shaper/report/{requestId}:
     parameters:
         - in: path
-          name: runId
-          description: A UUID returned by `/shaper/run` identifying a test execution.
+          name: requestId
+          description: A UUID returned by `/shaper/status` identifying a test result.
           required: true
           schema: 
             type: string
     get:
+      description: Returns an html report with details of the call tree that led to the specified result.
       responses:
         '200':
           description: OK
+          content:
+            text/html:
+              schema:
+                description: The visual report for call tree leading to the specified request.             
         '404':
           description: NOT FOUND
 components:
   schemas:
+    param:
+      type: object
+      properties:
+        name: 
+          type: string
+          description: The name or key for the parameter
+        value: 
+          type: string
+          description: The value to pass for the parameter
     run:  
+      required:
+        - endpoints
+        - swaggerUrl
       description: data required to start a test run
       type: object
       properties: 
+        numCases: 
+          type: integer
+          default: 1
+          description: The number of tests to run on each endpoint.
+        chainDepth:
+          type: integer
+          default: 1
+          description: The number of chains to potentially run. Each endpoint will be run numCases times, then this will repeat chainDepth times.
         endpoints: 
           type: array
           description: The endpoints from the open api spec to test.
@@ -76,3 +129,18 @@ components:
           properties:
             queryParams:
               type: array
+              items:
+                $ref: '#/components/schemas/param'
+            pathParams:
+              type: array
+              items:
+                $ref: '#/components/schemas/param'
+            headers:
+              type: array
+              items:
+                $ref: '#/components/schemas/param'
+            cookies:
+              type: array
+              items:
+                $ref: '#/components/schemas/param'
+
