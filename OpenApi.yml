@@ -17,6 +17,14 @@ paths:
       responses:
         '202':
           description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  runId:
+                    type: string
+                    description: UUID that identifiess a test 
+                    example: 34e4ef55-59a3-421c-afff-6aa7bfcc4f41
         '400':
           description: INVALID DATA
   /shaper/status/{runId}:
@@ -51,7 +59,7 @@ paths:
                         resultId:
                           type: string
                           description: UUID identifying a test result
-                        status: 
+                        responseCode: 
                           type: integer
                           description: The HTTP status code returned by the request
                           example: 500
@@ -60,21 +68,21 @@ paths:
                           description: The endpoint under test during for this result
         '404':
           description: NOT FOUND
-  /shaper/report/{requestId}:
+  /shaper/result/{resultId}:
     parameters:
         - in: path
-          name: requestId
+          name: resultId
           description: A UUID returned by `/shaper/status` identifying a test result.
           required: true
           schema: 
-            type: string
+            $ref: '#/components/schemas/result'
     get:
       description: Returns an html report with details of the call tree that led to the specified result.
       responses:
         '200':
           description: OK
           content:
-            text/html:
+            application/json:
               schema:
                 description: The visual report for call tree leading to the specified request.             
         '404':
@@ -90,6 +98,43 @@ components:
         value: 
           type: string
           description: The value to pass for the parameter
+    result:
+      description: result detials for a specified test
+      type: object
+      properties:
+        resultId: 
+          type: string
+          description: uuid of the test result
+        responseCode:
+          description: The HTTP status code returned by the request under test
+          type: integer
+          example: 500
+        method:
+          description: the REST API method under test
+          example: 401
+          type: string
+        path:
+          type: string
+          description: the api path under test
+          example: /pet/{petId}
+        url:
+          type: string
+          description: the url under test for this result
+          example: https://petstore.swagger.io/
+        runId:
+          type: string
+          description: UUID representing the full test run
+        inputBody:
+          type: string
+          description: a JSON string that was passed as a body in the test
+        jsonResponse:
+          type: string
+          description: The json response returned by the api under test
+        sourceResults:
+          description: list of results that led to the parent result. Shares the same format.
+          type: array
+          items:
+            $ref: '#/components/schemas/result'
     run:  
       required:
         - endpoints
