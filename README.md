@@ -50,7 +50,7 @@ Instead of flat tests on each API indepentently, Rest**Shape**r can test all API
 ```
 2) Use the `/status` API to retrieve the status of the current test. It will be either `IN_PROGRESS` or `DONE`.
    * When it is `DONE` it will also return a list of IDs as well as the URL and status code. Each entry in this list is a call that was made in the run. Use the `resultId` to look up details of the test. For example, you may want to investigate a 500 status code.
-3) Access the homepage in your browser and enter the result ID to view the results. Click the circle in the upper right to expand the call tree to see the full workflow that was run!
+3) Access the homepage in your browser and enter the result ID to view the results. Click the circle in the upper right to expand the call tree to see the full workflow that was run! Notice that it will resue the output from the linked APIs in the later APIs.
 
 ![Here is an exmaple report](./report-example.png)
 
