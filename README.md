@@ -3,7 +3,6 @@
   - [Summary](#summary)
     - [So what? That's easy.](#so-what-thats-easy)
     - [How to use it](#how-to-use-it)
-    - [How does it work?](#how-does-it-work)
   - [API spec](#api-spec)
 
 ## Summary
@@ -12,24 +11,26 @@ RestShaper is a service that generates data to test REST APIs based on an OpenAp
 
 ### So what? That's easy.
 
-There are a few big problems with traditional methods of generating test data:
+There are a few big problems with simpler methods of generating test data:
 
 1) *Random data is rarely useful for functional testing.* 
-   * The domain of, for example, strings you can generate for a string field is so large compared to the number of valid string, you will never get a valid string. This isn't a problem for fuzz testing since that is often just scanning for security issues or weird invalid cases. 
+   * The domain of, for example, strings you can generate for a string field is so large compared to the number of valid strings that you will probably never get a valid string for many fields. This isn't a problem for fuzz testing since that is often just scanning for security issues or weird invalid cases, but it is a problem for functional testing. 
 2)  *It's difficult to know if a test has passed or failed.*
     * With normal random testing, if your API returns a 400, is that OK? It's hard to know. If it's invalid data that is correct, but if you get a 400 with valid data that's a big problem.
 
-RestShaper attempts to salve this by saving and reusing the results of the API calls it has made in the past. This alows RestShpaer to generate known valid and invalid data, and pass random data through multiple API calls chained together. Doing this, RestShaper can generate true API workflow tests, instead of spamming a single api with tons of data that is doomed to fail.
+RestShaper attempts to solve this by saving and reusing the results of the API calls it has made in the past. 
 
-Instead of flat tests on each API indepentently, Rest**Shape**r can test all APIs in a specificication together to understand the **shape** of the REST API.
+This allows RestShpaer to generate known valid and invalid data, and pass that data through multiple API calls chained together. Doing this, RestShaper can generate tests for full API call chains, instead of spamming a single api with tons of data that is doomed to fail.
+
+In other words, instead of flat tests on each API indepentently, Rest**Shape**r can test all APIs in a specificication together to understand the **shape** of all of the endpints.
 
 
 ### How to use it
 
-1) Use the `/run` API to trigger a test. For example, the following test will run 5 cases on both the GET and POST `/pet` endpoints in the example swagger doc because `numcases` is 5. 
+1) Use the `/run` API to trigger a test. For example, the following request body will run 5 cases on both the GET and POST `/pet` endpoints in the example swagger doc because `numcases` is 5. 
    * It will then repeat this process twice due to `chainDepth`(for a total of 3 runs) So, 15 calls will be run on both endpoints for a total of 30 api calls. 
-   * `chainDepth` should be used to let every endpoint run before each other endpoint. For example, if `chainDepth` was 1, the POST call would not be able to use any of the results from the GET call. However, with `chainDepth` > 1, each endpoint will be called 5 times before the second iteration, so the second iteration of the POST call has some examples the use. The third iteration has even more examples.
-   * The return is an identiier for the run you can use for reviewing results.
+   * `chainDepth` should be used to let every endpoint run before each other endpoint. For example, if `chainDepth` was 1, the POST call would not be able to use any of the results from the GET call. However, with `chainDepth` > 1, each endpoint will be called 5 times before the second iteration, so the second iteration of the POST call has some examples the use. The third iteration has even more examples to pull from.
+   * The response body is an identifier for the run you can use for reviewing results.
 
 ```json
 {
@@ -55,12 +56,6 @@ Instead of flat tests on each API indepentently, Rest**Shape**r can test all API
 ![Here is an exmaple report](./report-example.png)
 
    
-### How does it work?
-
-WIP - 
-#1 from above is essentially complete but #2 needs some work. Will update more once complete, but you can see the OpenAPI spec below for information on how to use it.
-
-
 ## API spec
 WIP - will be updated with the correct server when hosted.
 
