@@ -1,6 +1,7 @@
 # RestShaper
 - [RestShaper](#restshaper)
   - [Summary](#summary)
+    - [Important note](#important-note)
     - [So what? That's easy.](#so-what-thats-easy)
     - [How to use it](#how-to-use-it)
   - [API spec](#api-spec)
@@ -8,6 +9,11 @@
 ## Summary
 
 RestShaper is a service that generates data to test REST APIs based on an OpenApi (AKA Swagger) specification, similar to fuzz testing.
+
+### Important note
+This development is still in an alpha state. It should only be used to test public APIs with publicly available info. Do not send proprietary or private information on the public API. 
+
+If you want to test proprietary information, please get in touch(through github or docksonwedge@outlook.com) and I can help you get a private server set up. 
 
 ### So what? That's easy.
 

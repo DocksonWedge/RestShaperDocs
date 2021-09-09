@@ -3,7 +3,7 @@ info:
   title: REST Shaper
   version: '1.0'
 servers:
-  - url: https://api.server.test/v1
+  - url: http://104.238.214.177:8080
 paths:
   /shaper/run:
     post:
